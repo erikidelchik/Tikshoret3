@@ -94,14 +94,11 @@ int main(int argc,char* argv[]){
         else{
             printf("invalid command\n");
         }
-
     }
     
     fclose(file);
     rudp_disconnect(sock);
     rudp_close(sock);
-
-
     return 0;
 
 
