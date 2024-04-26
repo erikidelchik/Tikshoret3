@@ -10,7 +10,7 @@
 #include <time.h>
 #include <stdio.h>
 #define SERVER_IP_ADDRESS "127.0.0.1"
-#define SERVER_PORT 5060
+#define SERVER_PORT 9997
 #define BUFFER_SIZE 1024
 
 typedef struct _rudp_socket
@@ -34,6 +34,13 @@ RUDP_Socket* rudp_socket(int isServer, unsigned short int listen_port){
     }
     sock->socket_fd = socketfd;
     memset((char *)&sock->dest_addr, 0, sizeof(sock->dest_addr));
+    
+    int reuse = 1;
+    if (setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+        perror("setsockopt");
+        close(socketfd);
+        exit(EXIT_FAILURE);
+    }
 
     if(isServer) {
         struct sockaddr_in self_addr;
@@ -98,6 +105,7 @@ int rudp_connect(RUDP_Socket *sockfd, const char *dest_ip, unsigned short int de
 int rudp_accept(RUDP_Socket *sockfd){
     if(sockfd->isConnected) return 0;
     char connectionAckBuffer [BUFFER_SIZE];
+    char* ack_msg = "ACK";
     socklen_t socklen = sizeof(sockfd->dest_addr);
     int connectionAckBytes = recvfrom(sockfd->socket_fd, connectionAckBuffer, sizeof(connectionAckBuffer),0,(struct sockaddr *)&sockfd->dest_addr, &socklen);
     if (connectionAckBytes == -1) {
@@ -106,7 +114,7 @@ int rudp_accept(RUDP_Socket *sockfd){
     }
     if(strncmp(connectionAckBuffer,"ACK",3)) return 0;
 
-    int sendResult = sendto(sockfd->socket_fd, connectionAckBuffer, sizeof(connectionAckBuffer)+1, 0, (struct sockaddr *)&sockfd->dest_addr, sizeof(sockfd->dest_addr));
+    int sendResult = sendto(sockfd->socket_fd, ack_msg, sizeof(ack_msg)+1, 0, (struct sockaddr *)&sockfd->dest_addr, sizeof(sockfd->dest_addr));
     if (sendResult == -1) {
         perror("send failed");
         exit(1);
@@ -163,4 +171,3 @@ void rudp_close(RUDP_Socket *sockfd){
     close(sockfd->socket_fd);
     free(sockfd);
 }
-
