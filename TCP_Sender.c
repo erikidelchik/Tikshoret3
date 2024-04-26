@@ -1,5 +1,5 @@
 /*
-        TCP/IP client
+        TCP/IP Sender
 */
 
 #include <arpa/inet.h>
@@ -162,4 +162,3 @@ int main(int argc,char ** argv) {
     close(sock);
     return 0;
 }
-
