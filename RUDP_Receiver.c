@@ -61,6 +61,7 @@ int main(int argc,char *argv[]){
                 totalBitsReceived += bitsReceived;
                 
                 memset(buffer, 0, BUFFER_SIZE);
+               
      
 
             }
@@ -84,14 +85,10 @@ int main(int argc,char *argv[]){
 
             totalBitsReceived=0;
 
-
         }
         rudp_disconnect(server_address);
         printf("Receiver end\n");
-
-
     }
-
 
     return 0;
 }
